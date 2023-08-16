@@ -1,9 +1,8 @@
-import 'dart:math';
-
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tab_scrollable_example/data.dart';
 import 'package:rect_getter/rect_getter.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,30 +24,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Product {
-  final String name;
-  final String description;
-  final String image;
-  final int categoryId;
-
-  Product({
-    required this.name,
-    required this.description,
-    required this.image,
-    required this.categoryId,
-  });
-}
-
-class ProductCategory {
-  int categoryId;
-  String name;
-
-  ProductCategory({
-    required this.name,
-    required this.categoryId,
-  });
-}
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -56,178 +31,16 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-enum VerticalScrollPosition { begin, middle, end }
-
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
-  Map<int, GlobalKey<RectGetterState>> _keys = {};
-  final VerticalScrollPosition verticalScrollPosition =
-      VerticalScrollPosition.begin;
+  late final TabController tabController = TabController(
+    length: categories.length,
+    vsync: this,
+  );
+
+  final GlobalKey<RectGetterState> listViewKey = RectGetter.createGlobalKey();
+  final Map<int, GlobalKey<RectGetterState>> _keys = {};
   final AutoScrollController scrollController = AutoScrollController();
-
-  final List<ProductCategory> categories = [
-    ProductCategory(
-      categoryId: 0,
-      name: "Cool cat",
-    ),
-    ProductCategory(
-      categoryId: 1,
-      name: "Sad cat",
-    ),
-    ProductCategory(
-      categoryId: 2,
-      name: "Mad cat",
-    ),
-    ProductCategory(
-      categoryId: 3,
-      name: "Bad cat",
-    ),
-    ProductCategory(
-      categoryId: 4,
-      name: "Sweet cat",
-    ),
-  ];
-
-  final List<Product> items = [
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 0,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 0,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 0,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 1,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 1,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 1,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 1,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 1,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 1,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 2,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 2,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 2,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 2,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 2,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 3,
-    ),
-    Product(
-        name: generateRandomString(),
-        description: generateRandomString(len: 100),
-        image:
-            "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-        categoryId: 3),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 4,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 4,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 4,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 4,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 4,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 4,
-    ),
-    Product(
-      name: generateRandomString(),
-      description: generateRandomString(len: 100),
-      image: "https://loremflickr.com/320/240?random=${Random().nextInt(100)}",
-      categoryId: 4,
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -237,13 +50,6 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  late final TabController tabController = TabController(
-    length: categories.length,
-    vsync: this,
-  );
-
-  var listViewKey = RectGetter.createGlobalKey();
-
   Widget buildBody(BuildContext context) {
     return RectGetter(
       key: listViewKey,
@@ -251,9 +57,6 @@ class _HomePageState extends State<HomePage>
         onNotification: onScrollNotification,
         child: CustomScrollView(
           controller: scrollController,
-          // scrollDirection: Axis.vertical,
-          // TODO: Shit solution
-          // cacheExtent: 10000,
           slivers: [
             buildSliverTabBar(),
             buildVerticalSliverList(context),
@@ -263,23 +66,12 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  @override
-  void initState() {
-    tabController.addListener(() {
-      if (VerticalScrollableTabBarStatus.isOnTap) {
-        VerticalScrollableTabBarStatus.isOnTap = false;
-        animateAndScrollTo(VerticalScrollableTabBarStatus.isOnTapIndex);
-      }
-    });
-    super.initState();
-  }
-
   Widget buildItem(int index, BuildContext context) {
     var item = items[index];
     if ((index == 0 || item.categoryId != items[index - 1].categoryId)) {
       _keys[item.categoryId] = RectGetter.createGlobalKey();
     }
-    Widget widget = Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if ((index == 0 || item.categoryId != items[index - 1].categoryId))
@@ -337,34 +129,35 @@ class _HomePageState extends State<HomePage>
         ),
       ],
     );
-    return widget;
   }
 
   Widget buildSliverTabBar() {
     return SliverAppBar(
       pinned: true,
-      title: Text("AppBar"),
+      title: const Text("AppBar"),
       bottom: TabBar(
         isScrollable: true,
         controller: tabController,
-        indicatorPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+        indicatorPadding: const EdgeInsets.symmetric(horizontal: 10.0),
         indicatorWeight: 3.0,
+        indicatorSize: TabBarIndicatorSize.tab,
         tabs: categories.map((e) => Tab(child: Text(e.name))).toList(),
         onTap: (index) {
           var _index = categories[index].categoryId;
-          VerticalScrollableTabBarStatus.setIndex(_index);
+          animateAndScrollTo(_index);
         },
       ),
     );
   }
 
   Widget buildVerticalSliverList(BuildContext context) {
-    // TODO: Shit solution too, but whats the other way to scroll
     return SliverToBoxAdapter(
-      child: Column(
-        children: List.generate(
-          items.length,
-          (index) => buildItem(index, context),
+      child: ScrollablePositionedList.builder(
+        shrinkWrap: true,
+        itemCount: items.length,
+        itemBuilder: (BuildContext context, int index) => buildItem(
+          index,
+          context,
         ),
       ),
     );
@@ -391,6 +184,7 @@ class _HomePageState extends State<HomePage>
     List<int> items = [];
     if (rect == null) return items;
     _keys.forEach((index, key) {
+      // TODO: on closest to top
       Rect? itemRect = RectGetter.getRectFromKey(key);
       if (itemRect == null) return;
       if (itemRect.top > rect.bottom) return;
@@ -400,22 +194,5 @@ class _HomePageState extends State<HomePage>
       items.add(index);
     });
     return items;
-  }
-}
-
-String generateRandomString({int len = 10}) {
-  var r = Random();
-  return String.fromCharCodes(
-      List.generate(len, (index) => r.nextInt(33) + 89));
-}
-
-
-class VerticalScrollableTabBarStatus {
-  static bool isOnTap = false;
-  static int isOnTapIndex = 0;
-
-  static void setIndex(int index) {
-    VerticalScrollableTabBarStatus.isOnTap = true;
-    VerticalScrollableTabBarStatus.isOnTapIndex = index;
   }
 }
