@@ -104,6 +104,13 @@ class _HomePageState extends State<HomePage>
                   Image.network(
                     item.image,
                     width: 120,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const SizedBox(
+                        width: 120,
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    },
                   ),
                   const SizedBox(width: 10),
                   Flexible(
@@ -143,8 +150,8 @@ class _HomePageState extends State<HomePage>
         indicatorSize: TabBarIndicatorSize.tab,
         tabs: categories.map((e) => Tab(child: Text(e.name))).toList(),
         onTap: (index) {
-          var _index = categories[index].categoryId;
-          animateAndScrollTo(_index);
+          var categoryId = categories[index].categoryId;
+          animateAndScrollTo(categoryId);
         },
       ),
     );
